@@ -38,6 +38,10 @@ jobs:
       # - name: Run tests with coverage
       #   run: npx jest --testMatch="**/*.test.js"
 
+      - name: Compare coverage increase
+        run: |
+          node ./scripts/check-coverage-delta.js
+
       - name: Upload test results artifact
         uses: actions/upload-artifact@v4
         if: always()
