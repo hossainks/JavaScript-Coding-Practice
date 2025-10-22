@@ -15,15 +15,24 @@ const base = JSON.parse(fs.readFileSync(basePath));
 const current = JSON.parse(fs.readFileSync(newPath));
 
 // Get list of changed JS files compared to main
-const changedFiles = execSync(
-  "git fetch origin main && git diff --name-only origin/main...HEAD",
-  {
-    encoding: "utf8",
-  }
-)
-  .split("\n")
-  .filter((f) => f.endsWith(".js") || f.endsWith(".ts"))
-  .filter(Boolean);
+let changedFiles = [];
+try {
+  const diffOutput = execSync(
+    "git fetch origin main && git diff --name-only origin/main...HEAD",
+    {
+      encoding: "utf8",
+    }
+  );
+  changedFiles = diffOutput
+    .split("\n")
+    .filter((f) => f.endsWith(".js") || f.endsWith(".ts"))
+    .filter(Boolean);
+} catch (err) {
+  console.warn(
+    "⚠️ Could not determine changed files, defaulting to all current files."
+  );
+  changedFiles = Object.keys(current);
+}
 
 console.log("Changed files:", changedFiles);
 
