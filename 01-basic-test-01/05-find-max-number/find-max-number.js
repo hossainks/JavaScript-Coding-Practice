@@ -1,4 +1,4 @@
-/* function findMaxNumber(number) {
+function findMaxNumber2(number) {
   let max = number[0];
   for (let i = 0; i < number.length; i++) {
     if (max < number[i]) {
@@ -6,7 +6,7 @@
     }
   }
   return max;
-} */
+}
 
 function findMaxNumber(number) {
   return Math.max(...number);
