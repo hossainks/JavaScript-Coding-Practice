@@ -2,7 +2,7 @@
 const fs = require("fs");
 
 const basePath = "coverage-base/coverage-summary.json";
-const newPath = "coverage/coverage-summary.json";
+const newPath = "coverage-new/coverage-summary.json";
 
 if (!fs.existsSync(basePath)) {
   console.warn("Base coverage not found, skipping delta check.");
