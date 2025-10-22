@@ -1,4 +1,4 @@
-name: Full Spectrum Testing
+name: Unit Testing
 on:
   push:
     branches:
