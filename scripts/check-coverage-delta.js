@@ -1,8 +1,8 @@
 const fs = require("fs");
+const path = require("path");
 const { execSync } = require("child_process");
 
-const THRESHOLD = 5; // minimum coverage increase %
-
+const THRESHOLD = 5;
 const basePath = "coverage-base/coverage-summary.json";
 const newPath = "coverage-new/coverage-summary.json";
 
@@ -14,26 +14,38 @@ if (!fs.existsSync(basePath)) {
 const base = JSON.parse(fs.readFileSync(basePath));
 const current = JSON.parse(fs.readFileSync(newPath));
 
-// Get list of changed JS files compared to main
-const changedFiles = execSync(
-  "git fetch origin main && git diff --name-only origin/main...HEAD",
-  {
-    encoding: "utf8",
-  }
-)
-  .split("\n")
-  .filter((f) => f.endsWith(".js") || f.endsWith(".ts"))
-  .filter(Boolean);
+// Get changed files
+let changedFiles = [];
+try {
+  const diffOutput = execSync(
+    "git fetch origin main && git diff --name-only origin/main...HEAD",
+    { encoding: "utf8" }
+  );
+  changedFiles = diffOutput
+    .split("\n")
+    .filter((f) => f.endsWith(".js") || f.endsWith(".ts"))
+    .filter(Boolean);
+} catch (err) {
+  console.warn("⚠️ Could not determine changed files, comparing all instead.");
+  changedFiles = Object.keys(current);
+}
 
 console.log("Changed files:", changedFiles);
 
 let failed = false;
 
-for (const file of changedFiles) {
-  if (!base[file] || !current[file]) continue;
+// Normalize coverage file keys
+const normalize = (p) => p.split(path.sep).join("/"); // ensure consistent slashes
+const baseKeys = Object.keys(base);
+const currentKeys = Object.keys(current);
 
-  const basePct = base[file].lines.pct;
-  const newPct = current[file].lines.pct;
+for (const file of changedFiles) {
+  // Try to find matching coverage key
+  const matchedKey = currentKeys.find((k) => k.endsWith(file));
+  if (!matchedKey || !baseKeys.find((k) => k.endsWith(file))) continue;
+
+  const basePct = base[baseKeys.find((k) => k.endsWith(file))].lines.pct;
+  const newPct = current[matchedKey].lines.pct;
   const delta = newPct - basePct;
 
   if (delta < THRESHOLD) {
@@ -47,10 +59,7 @@ for (const file of changedFiles) {
 }
 
 if (failed) {
-  console.error(
-    `\n🚫 Some changed files did not increase coverage by >=${THRESHOLD}%`
-  );
   process.exit(1);
 } else {
-  console.log(`✅ All changed files increased coverage by >=${THRESHOLD}%`);
+  console.log("✅ All changed files increased coverage by >=5%.");
 }
