@@ -22,7 +22,7 @@ jobs:
       - name: Download base coverage from main
         uses: dawidd6/action-download-artifact@v2
         with:
-          workflow: main-coverage.yml
+          workflow: main-coverage.yaml
           workflow_conclusion: success
           branch: main
           name: base-coverage
