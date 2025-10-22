@@ -4,7 +4,7 @@ module.exports = {
   // Coverage configuration
   collectCoverage: true,
   coverageDirectory: "coverage",
-  coverageReporters: ["text-summary", "text", "html"],
+  coverageReporters: ["json", "json-summary", "text-summary", "text", "html"],
 
   // ignore all Playwright tests
   testPathIgnorePatterns: ["/node_modules/", "/test-e2e/"],
