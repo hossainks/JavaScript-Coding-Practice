@@ -11,8 +11,8 @@ if (!fs.existsSync(basePath)) {
   process.exit(0);
 }
 
-const base = JSON.parse(fs.readFileSync(basePath));
-const current = JSON.parse(fs.readFileSync(newPath));
+const base = JSON.parse(fs.readFileSync(basePath), "utf-8");
+const current = JSON.parse(fs.readFileSync(newPath), "utf-8");
 
 // Get changed files
 let changedFiles = [];
